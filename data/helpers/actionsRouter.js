@@ -17,7 +17,7 @@ router.get("/", (req, res) => {
     });
 });
 
-// GET /:d
+// GET /:id
 router.get("/:id", (req, res) => {
   const id = req.params.id;
 
@@ -33,7 +33,7 @@ router.get("/:id", (req, res) => {
     });
 });
 
-// POST
+// POST /
 router.post("/", (req, res) => {
   const action = req.body;
   actionDb
