@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
 });
 
 // GET /:id
-router.get("/:id", (req, res) => {
+router.get("/:id", validateUserId, (req, res) => {
   const id = req.params.id;
 
   actionDb
@@ -34,7 +34,7 @@ router.get("/:id", (req, res) => {
 });
 
 // POST /
-router.post("/", (req, res) => {
+router.post("/", validateUser, (req, res) => {
   const action = req.body;
   actionDb
     .insert(req.body)
@@ -49,7 +49,7 @@ router.post("/", (req, res) => {
 });
 
 // PUT /:id
-router.put("/:id", (req, res) => {
+router.put("/:id", validateUserId, (req, res) => {
   const id = req.params.id;
   const update = req.body;
 
@@ -66,7 +66,7 @@ router.put("/:id", (req, res) => {
 });
 
 // DELETE /:id
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validateUserId, validateUser, (req, res) => {
   const id = req.params.id;
 
   actionDb
@@ -80,5 +80,29 @@ router.delete("/:id", (req, res) => {
       });
     });
 });
+
+// Custom middleware
+
+function validateUserId(req, res, next) {
+  const id = req.params.id;
+  actionDb.get(id).then(user => {
+    if (user) {
+      next();
+    } else {
+      res.status(404).json({ message: `Invalid id of ${id}` });
+    }
+  });
+}
+
+function validateUser(req, res, next) {
+  const action = req.body;
+  if (!action.description || !action.notes) {
+    return res
+      .status(400)
+      .json({ message: "missing required description or notes field" });
+  } else {
+    next();
+  }
+}
 
 module.exports = router;
